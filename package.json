@@ -10,6 +10,7 @@
     "nodemon": "^2.0.15"
   },
   "scripts": {
-    "start:server": "NODE_OPTIONS='--experimental-specifier-resolution=node' nodemon ./index.js"
+    "start": "./index.js",
+    "start:dev": "NODE_OPTIONS='--experimental-specifier-resolution=node' nodemon ./index.js"
   }
 }
