@@ -1,0 +1,15 @@
+{
+  "type": "module",
+  "dependencies": {
+    "amqplib": "^0.8.0",
+    "express": "^4.17.3",
+    "socket.io": "^4.4.1",
+    "tiktok-livestream-chat-connector": "^0.9.15"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  },
+  "scripts": {
+    "start:server": "NODE_OPTIONS='--experimental-specifier-resolution=node' nodemon ./index.js"
+  }
+}
