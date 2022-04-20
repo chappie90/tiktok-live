@@ -20,19 +20,20 @@ function App() {
     enter: { opacity: 1, x: 0 },
     leave: { opacity: 0, x: -50 },
   });
-  const [idInput, setIdInput] = useState("");
+  const [idInput, setIdInput] = useState("betk4r_.x7");
   const [stateText, setStateText] = useState("");
   const [connectedRoom, setConnectedRoom] = useState(false);
   const [viewerCount, setViewerCount] = useState(null);
   const [likeCount, setLikeCount] = useState(null);
   const [waitingList, setWaitingList] = useState(null);
-  const [diamondsCount, setDiamondsCount] = useState(null);
+  const diamondsCount = useRef(0);
   const ioConnectionRef = useRef(null);
   const [emoteValue, setEmoteValue] = useState("");
   const [manualSpeech, setManualSpeech] = useState(DEFAULT_MANUAL_SPEECH);
   const isManualSpeech = useRef(false);
   const isAutomaticSpeech = useRef(false);
   const [allGifts, setAllGifts] = useState(null);
+  const [loaded, setLoaded] = useState(false);
 
   const connect = () => {
     if (idInput !== "") {
@@ -43,17 +44,45 @@ function App() {
     }
   };
 
+  const addEnterEvent = () => {
+    document.addEventListener("keyup", async function (event) {
+      if (event.keyCode === 13) {
+        event.preventDefault();
+        await playManualSpeech();
+      }
+    });
+  };
+
+  const onStartBtnClick = () => {
+    connect();
+    addEnterEvent();
+    setLoaded(true);
+  };
+
   const processTiktokEvent = async (data, mqMsg) => {
     setMessage(data);
 
-    if (data.type === "social" || data.type === "gift") {
+    if (data.type === "social") {
       await hostSpeak(
         GRATITUDE_PHRASES[Math.floor(Math.random() * GRATITUDE_PHRASES.length)]
       );
       await asyncTimeout(1000);
       isAutomaticSpeech.current = false;
+    } else if (data.type === "gift") {
+      if (diamondsCount.current > 50) {
+        await hostSpeak(
+          GRATITUDE_PHRASES[
+            Math.floor(Math.random() * GRATITUDE_PHRASES.length)
+          ]
+        );
+        await asyncTimeout(1000);
+        await handlePlayGesture();
+        await asyncTimeout(1000);
+        isAutomaticSpeech.current = false;
+        diamondsCount.current = 0;
+      }
     } else {
-      await asyncTimeout(2500);
+      await asyncTimeout(1700);
     }
 
     setMessage("");
@@ -63,9 +92,9 @@ function App() {
   };
 
   // Play manual speech
-  const onChangeManualSpeech = (event) => {
-    setManualSpeech(event.target.value);
-  };
+  // const onChangeManualSpeech = (event) => {
+  //   setManualSpeech(event.target.value);
+  // };
 
   const playManualSpeech = async () => {
     if (isAutomaticSpeech.current) {
@@ -78,24 +107,28 @@ function App() {
   };
 
   // Play emote on demand with emote button
-  const onChangeEmoteValue = (event) => {
-    setEmoteValue(event.target.value);
-  };
+  // const onChangeEmoteValue = (event) => {
+  //   setEmoteValue(event.target.value);
+  // };
 
   const handlePlayGesture = async () => {
-    const getstureName = ANIMATIONS_MAP[emoteValue] || "Emote";
-    await hostPlayGesture(getstureName, emoteValue);
+    const keys = Object.keys(ANIMATIONS_MAP);
+    const randomGesture = keys[Math.floor(Math.random() * keys.length)];
+    await hostPlayGesture(randomGesture, randomGesture);
   };
 
   useEffect(() => {
-    const ioConnection = new io("http://localhost:3001");
+    // const ioConnection = new io("http://localhost:3001");
+    const ioConnection = new io(
+      "https://tiktok-live-server-prod.herokuapp.com"
+    );
 
     // On successful connection
     ioConnection.on("setUniqueIdSuccess", (state) => {
       // Reset stats
       setViewerCount(0);
       setLikeCount(0);
-      setDiamondsCount(0);
+      diamondsCount.current = 0;
       setStateText(`Connected to roomId ${state.roomId}`);
       setConnectedRoom(true);
     });
@@ -133,7 +166,7 @@ function App() {
     });
 
     function isPendingStreak(data) {
-      return data.gift.gift_type === 1 && !data.gift.repeat_end;
+      return data.gift?.gift_type === 1 && !data.gift?.repeat_end;
     }
 
     // Process tiktok event
@@ -144,7 +177,7 @@ function App() {
       switch (data.type) {
         case "like":
           if (data.likeCount) {
-            text = `sent ${data.likeCount} x ❤️ to Phendran`;
+            text = `sent ❤️ x ${data.likeCount} to Phendran`;
           }
           break;
         case "social":
@@ -153,15 +186,23 @@ function App() {
           break;
         case "gift":
           console.log(event);
-          // if (!isPendingStreak(data) && data.extendedGiftInfo.diamond_count > 0) {
-          //   diamondsCount +=
-          //     data.extendedGiftInfo.diamond_count * data.gift.repeat_count;
-          // }
-          text = data.extendedGiftInfo.describe;
-          // diamond_count: 30
-          // image.url_list[0] || icon.url_list[0]
-          // name: Mirror
-          isAutomaticSpeech.current = true;
+          if (data.gift && data.extendedGiftInfo) {
+            if (
+              !isPendingStreak(data) &&
+              data.extendedGiftInfo.diamond_count > 0
+            ) {
+              diamondsCount.current =
+                data.extendedGiftInfo.diamond_count * data.gift.repeat_count;
+              text = {
+                repeatCount: data.gift.repeat_count,
+                diamondsCount: diamondsCount.current,
+                giftIcon:
+                  data.extendedGiftInfo.image.url_list[0] ||
+                  data.extendedGiftInfo.icon.url_list[0],
+              };
+              isAutomaticSpeech.current = true;
+            }
+          }
           break;
         default:
           return;
@@ -172,7 +213,7 @@ function App() {
       if (isManualSpeech.current) {
         setTimeout(() => {
           processTiktokEvent(modifiedData, mqMsg);
-        }, 4000);
+        }, 8000);
       } else {
         processTiktokEvent(modifiedData, mqMsg);
       }
@@ -197,28 +238,69 @@ function App() {
     <div className="container">
       <Scene />
       {transitions(({ opacity, x }, item) => {
-        const image =
-          item.extendedGiftInfo?.image.url_list[0] ||
-          item.extendedGiftInfo?.icon.url_list[0];
         return (
           item.text && (
-            <animated.div className="message-text" style={{ opacity, x }}>
-              {item.profilePictureUrl && (
-                <img
-                  src={item.profilePictureUrl}
-                  className="avatar"
-                  alt="img"
-                />
+            <>
+              {typeof item.text === "string" ? (
+                <animated.div className="message-text" style={{ opacity, x }}>
+                  {item.profilePictureUrl && (
+                    <img
+                      style={{
+                        opacity,
+                        x,
+                        transform: x
+                          .to({
+                            range: [0, 1],
+                            output: [0, 1],
+                          })
+                          .to((x) => `scale(${x})`),
+                      }}
+                      src={item.profilePictureUrl}
+                      className="avatar"
+                      alt="img"
+                    />
+                  )}
+                  <div>
+                    <span className="username">{item.uniqueId} </span>
+                    <span className="text"> {sanitizeText(item.text)}</span>
+                  </div>
+                </animated.div>
+              ) : (
+                <animated.div className="message-text" style={{ opacity, x }}>
+                  {item.profilePictureUrl && (
+                    <img
+                      style={{
+                        opacity,
+                        x,
+                      }}
+                      src={item.profilePictureUrl}
+                      className="avatar"
+                      alt="img"
+                    />
+                  )}
+                  <div>
+                    <span className="username">{item.uniqueId} </span>
+                    <span className="text">sent </span>
+                    {item.text.giftIcon && (
+                      <img
+                        src={item.text.giftIcon}
+                        className="gift-icon"
+                        alt="img"
+                      />
+                    )}
+                    <span className="text">
+                      x{" "}
+                      {`${item.text.repeatCount} (${item.text.diamondsCount} x diamonds)`}
+                    </span>
+                  </div>
+                </animated.div>
               )}
-              <span className="username">{item.uniqueId} </span>
-              <span className="text"> {sanitizeText(item.text)}</span>
-              {image && <img src={image} className="gift-icon" alt="img" />}
-            </animated.div>
+            </>
           )
         );
       })}
-      <header className="header">
-        <div className="input-group">
+      {/* <header className="header">
+      <div className="input-group">
           <input
             type="text"
             onChange={(e) => setIdInput(e.target.value)}
@@ -233,11 +315,11 @@ function App() {
             className="button"
           />
         </div>
-        <div className="meta">
-          <div id="stateText">{stateText}</div>
-          {connectedRoom && (
+      <div className="meta">
+      <div id="stateText">{stateText}</div>
+      {connectedRoom && (
             <div id="roomStats">
-              <span className="metric">
+              <span className="metric username">
                 Waitlist: <b>{waitingList}</b>
               </span>
               {/* <span className="metric">
@@ -248,14 +330,12 @@ function App() {
               </span>
               <span className="metric">
                 Earned Diamonds: <b>{diamondsCount}</b>
-              </span> */}
-            </div>
-          )}
-        </div>
-      </header>
-
-      <div id="textToSpeech">
-        <div>
+              </span>
+      </div>
+      )} 
+     </div>
+       </header> */}
+      {/* <div>
           <textarea
             size="46"
             cols="40"
@@ -265,13 +345,35 @@ function App() {
             value={manualSpeech}
             onChange={onChangeManualSpeech}
           ></textarea>
-        </div>
+        </div>*/}
+      {loaded && connectedRoom && (
         <div>
-          <button onClick={playManualSpeech} id="play" className="speechButton">
-            Play
-          </button>
+          <div className="greeting">
+            <span>Hi, my name is Phendran.</span>
+            <span> I hope you enjoy the show :)</span>
+          </div>
+          <div className="waitlist">
+            <span className="label">Waitlist:</span>
+            <span className="count">{waitingList}</span>
+          </div>
+          <div className="legend">
+            <span className="offer">
+              Follow / Share / Gift{" "}
+              <span style={{ color: "orange" }}>&#8594;</span> Reply
+            </span>
+            <span className="offer">
+              Gift {`>`} 50 x diamonds{" "}
+              <span style={{ color: "orange" }}>&#8594;</span> Performance
+            </span>
+          </div>
         </div>
-        <div>
+      )}
+      {!loaded && (
+        <button onClick={onStartBtnClick} id="play" className="playBtn">
+          Play
+        </button>
+      )}
+      {/* <div>
           <select
             onChange={onChangeEmoteValue}
             className="gestureButton"
@@ -293,41 +395,7 @@ function App() {
           >
             Play Emote
           </button>
-        </div>
-      </div>
-      {/* <main className="main">
-        {connectedRoom && (
-          <div className="lists">
-            <div className="chats-container">
-              <h3 className="title">Chats</h3>
-              <div className="chats-list">
-                {chat.length > 0 ? (
-                  chat.map((msg, i) => (
-                    <div key={i} className="row">
-                      <img src={msg.profileImg} className="avatar" alt="img" />
-                      <span>{msg.uniqueId}: </span>
-                      <span className="message-text">{sanitizeText(msg.text)}</span>
-                    </div>
-                  ))
-                ) : (
-                  <span>No chats yet</span>
-                )}
-                <div ref={lastMessageRef} />
-              </div>
-            </div>
-            <div className="gifts-container">
-              <h3 className="title">Gifts</h3>
-              <div className="gifts-list">
-                {gifts.length > 0 ? (
-                  gifts.map((gift) => <div className="row"></div>)
-                ) : (
-                  <span>No gifts yet</span>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-      </main> */}
+        </div> */}
     </div>
   );
 }

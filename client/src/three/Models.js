@@ -82,7 +82,8 @@ function AlienModel() {
       bindPoseOffset: bindPoseOffset2,
     } = await loadCharacter(scene, characterFile, ANIMATION_FILES);
 
-    character2.position.set(0, 0, 1);
+    character2.position.set(0, 0, 2);
+    // character2.position.set(0, 0, 1);
     character2.rotateY(0);
 
     // Find the joints defined by name
@@ -211,7 +212,8 @@ function AlienModel() {
     pmremGenerator.compileEquirectangularShader();
 
     const controls = new OrbitControls(camera, renderer.domElement);
-    camera.position.set(0, 0.6, 3.2);
+    camera.position.set(0, 0.6, 4.2);
+    // camera.position.set(0, 0.6, 3.2);
     controls.target = new THREE.Vector3(0, 1.4, 0);
     controls.screenSpacePanning = true;
     controls.update();
@@ -277,7 +279,7 @@ function AlienModel() {
       moonSurface
     );
     ground.rotation.x = -Math.PI / 2;
-    ground.receiveShadow = true;
+    // ground.receiveShadow = true;
     scene.add(ground);
 
     return { scene, camera, clock };
@@ -799,9 +801,6 @@ function AlienModel() {
       }
     );
 
-    console.log("host");
-    console.log(host);
-
     return host;
   };
 
@@ -937,7 +936,7 @@ function AlienModel() {
 
     // Animate stars background
     renderFn.push(() => {
-      const time = Date.now() * 0.0015;
+      const time = Date.now() * 0.003;
       particleSystem.rotation.z = 0.01 * time;
     });
   }

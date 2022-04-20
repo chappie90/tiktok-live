@@ -1,5 +1,5 @@
 export const ANIMATIONS_MAP = {
-  ANGRY: "angry",
+  // ANGRY: "angry",
   HIP_HOP_DANCING: "HIP_HOP_DANCING",
   RUMBA_DANCING: "RUMBA_DANCING",
   JOYFUL_JUMP: "JOYFUL_JUMP",
@@ -15,7 +15,7 @@ export const ANIMATIONS_MAP = {
   SURPRISED: "SURPRISED",
   SAMBA_DANCING: "SAMBA_DANCING",
   SITTING: "SITTING",
-  JUMPING: "JUMPING",
+  // JUMPING: "JUMPING",
   HIP_HOP_DANCING_2: "HIP_HOP_DANCING_2",
   SPIN_IN_PLACE: "SPIN_IN_PLACE",
   FIST_FIGHT_A: "FIST_FIGHT_A",
@@ -77,12 +77,24 @@ export const GRATITUDE_PHRASES = [
   "Big thank you!",
   "You're awesome!",
   "You've warmed my heart!",
-  "Beyond grateful!",
+  "I am beyond grateful!",
   "Feeling spoiled!",
   "God bless you!",
   "Thank you! Thank you! Thank you!",
   "Lots of love!",
   "Legend!",
+  "You've made my day!",
+  "You are amazing!",
+  "I wish you and your family health and prosperity!",
+  "You are a selfless human being!",
+  "Thank you! You are so generous!",
+  "Sending you my warmest wishes and blessings!",
+  "Wishing you a relaxing and stress free day!",
+  "Wishing you lots of love, joy and happiness!",
+  "May the year ahead be full of contentment and joy!",
+  "May your life be filled with moments of love, laughter and goodwill!",
+  "Wishing you and your loved ones peace, health, happiness, and prosperity!",
+  "Let the spirit of love gently fill your heart and home!",
 ];
 
-export const DEFAULT_MANUAL_SPEECH = `Hi there! My name is Phendran! If you like, follow and send gifts I will show you my appreciation.`;
+export const DEFAULT_MANUAL_SPEECH = `Hi there! My name is Phendran! If you follow, share, and send gifts I will show you my appreciation!`;

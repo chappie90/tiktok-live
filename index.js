@@ -7,7 +7,7 @@ import amqp from "amqplib/callback_api";
 
 const RABBIT_MQ_CONN_URL =
   "amqps://zlnypzcv:V_7jHO6wUYZrW5YAp-LBgAon7AAJTDDB@rattlesnake.rmq.cloudamqp.com/zlnypzcv";
-const RQBBIT_MQ_QUEUE = "tiktok_live_DEV";
+const RQBBIT_MQ_QUEUE = "tiktok_live_PROD";
 
 // Create express / socket server
 const app = express();
@@ -27,9 +27,9 @@ const publishToQueue = async ({ channel, queueName, data, type }) => {
   const payload = JSON.stringify({ ...data, type });
   if (channel) {
     // Disable for testing to avoid hitting limit
-    // channel.sendToQueue(queueName, Buffer.from(payload), {
-    //   persistent: true,
-    // });
+    channel.sendToQueue(queueName, Buffer.from(payload), {
+      persistent: true,
+    });
   }
 };
 
