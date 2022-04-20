@@ -35,9 +35,10 @@
   padding: 0 1.25rem;
   color: white;
   display: flex;
+  align-items: center;
   position: absolute;
   z-index: 20;
-  top: 350px;
+  top: 365px;
   left: 1.25rem;
   min-width: 400px;
   font-size: 1.6rem;
@@ -73,7 +74,7 @@
 
 .legend {
   position: absolute;
-  top: 220px;
+  top: 250px;
   right: 15px;
   display: flex;
   flex-direction: column;
@@ -111,7 +112,7 @@
 
 .greeting {
   position: absolute;
-  top: 165px;
+  top: 195px;
   left: 15px;
   color: orange;
   font-size: 1.5rem;
@@ -119,7 +120,7 @@
 
 .waitlist {
   position: absolute;
-  top: 220px;
+  top: 250px;
   left: 15px;
 }
 

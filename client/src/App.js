@@ -20,7 +20,7 @@ function App() {
     enter: { opacity: 1, x: 0 },
     leave: { opacity: 0, x: -50 },
   });
-  const [idInput, setIdInput] = useState("betk4r_.x7");
+  const [idInput, setIdInput] = useState("discover_the_cosmos");
   const [stateText, setStateText] = useState("");
   const [connectedRoom, setConnectedRoom] = useState(false);
   const [viewerCount, setViewerCount] = useState(null);
@@ -185,7 +185,6 @@ function App() {
           isAutomaticSpeech.current = true;
           break;
         case "gift":
-          console.log(event);
           if (data.gift && data.extendedGiftInfo) {
             if (
               !isPendingStreak(data) &&
@@ -354,7 +353,7 @@ function App() {
           </div>
           <div className="waitlist">
             <span className="label">Waitlist:</span>
-            <span className="count">{waitingList}</span>
+            <span className="count">{waitingList ?? 0}</span>
           </div>
           <div className="legend">
             <span className="offer">
