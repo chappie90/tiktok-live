@@ -148,7 +148,10 @@ io.on("connection", (socket) => {
       // Viewer count
       socket.emit("roomUser", msg);
     });
-    thisConnection.on("member", async (msg) => {}); // When someone joins
+    thisConnection.on("member", async (msg) => {
+      // When someone joins
+      socket.emit("join", msg);
+    });
     thisConnection.on("chat", async (msg) => {});
     thisConnection.on("gift", async (msg) => {
       await publishToQueue({

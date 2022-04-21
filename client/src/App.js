@@ -49,6 +49,8 @@ function App() {
       if (event.keyCode === 13) {
         event.preventDefault();
         await playManualSpeech();
+        await asyncTimeout(1000);
+        await handlePlayGesture();
       }
     });
   };
@@ -62,7 +64,7 @@ function App() {
   const processTiktokEvent = async (data, mqMsg) => {
     setMessage(data);
 
-    if (data.type === "social") {
+    if (data.type === "social" || data.type === "like") {
       await hostSpeak(
         GRATITUDE_PHRASES[Math.floor(Math.random() * GRATITUDE_PHRASES.length)]
       );
@@ -150,6 +152,21 @@ function App() {
       }
     });
 
+    ioConnection.on("join", async (msg) => {
+      if (viewerCount < 5) {
+        isManualSpeech.current = true;
+        await hostSpeak(
+          GRATITUDE_PHRASES[
+            Math.floor(Math.random() * GRATITUDE_PHRASES.length)
+          ]
+        );
+        await asyncTimeout(1000);
+        await handlePlayGesture();
+        await asyncTimeout(1000);
+        isManualSpeech.current = false;
+      }
+    });
+
     // Waiting list
     ioConnection.on("waitingList", (count) => {
       setWaitingList(count);
@@ -212,7 +229,7 @@ function App() {
       if (isManualSpeech.current) {
         setTimeout(() => {
           processTiktokEvent(modifiedData, mqMsg);
-        }, 8000);
+        }, 14000);
       } else {
         processTiktokEvent(modifiedData, mqMsg);
       }
