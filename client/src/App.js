@@ -120,10 +120,10 @@ function App() {
   };
 
   useEffect(() => {
-    const ioConnection = new io("http://localhost:3001");
-    // const ioConnection = new io(
-    //   "https://tiktok-live-server-prod.herokuapp.com"
-    // );
+    // const ioConnection = new io("http://localhost:3001");
+    const ioConnection = new io(
+      "https://tiktok-live-server-prod.herokuapp.com"
+    );
 
     // On successful connection
     ioConnection.on("setUniqueIdSuccess", (state) => {
@@ -367,6 +367,7 @@ function App() {
           <div className="greeting">
             <span>Hi, my name is Phendran!</span>
             <span>Like and follow to interact with me!</span>
+            <span>Sorry for the small delay :)</span>
           </div>
           <div className="waitlist">
             <span className="label">Waitlist:</span>
