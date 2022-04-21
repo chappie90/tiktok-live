@@ -20,7 +20,7 @@ function App() {
     enter: { opacity: 1, x: 0 },
     leave: { opacity: 0, x: -50 },
   });
-  const [idInput, setIdInput] = useState("software.print");
+  const [idInput, setIdInput] = useState("discover_the_cosmos");
   const [stateText, setStateText] = useState("");
   const [connectedRoom, setConnectedRoom] = useState(false);
   const viewerCount = useRef(0);
