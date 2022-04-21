@@ -20,10 +20,10 @@ function App() {
     enter: { opacity: 1, x: 0 },
     leave: { opacity: 0, x: -50 },
   });
-  const [idInput, setIdInput] = useState("discover_the_cosmos");
+  const [idInput, setIdInput] = useState("software.print");
   const [stateText, setStateText] = useState("");
   const [connectedRoom, setConnectedRoom] = useState(false);
-  const [viewerCount, setViewerCount] = useState(null);
+  const viewerCount = useRef(0);
   const [likeCount, setLikeCount] = useState(null);
   const [waitingList, setWaitingList] = useState(null);
   const diamondsCount = useRef(0);
@@ -120,15 +120,15 @@ function App() {
   };
 
   useEffect(() => {
-    // const ioConnection = new io("http://localhost:3001");
-    const ioConnection = new io(
-      "https://tiktok-live-server-prod.herokuapp.com"
-    );
+    const ioConnection = new io("http://localhost:3001");
+    // const ioConnection = new io(
+    //   "https://tiktok-live-server-prod.herokuapp.com"
+    // );
 
     // On successful connection
     ioConnection.on("setUniqueIdSuccess", (state) => {
       // Reset stats
-      setViewerCount(0);
+      viewerCount.current = 0;
       setLikeCount(0);
       diamondsCount.current = 0;
       setStateText(`Connected to roomId ${state.roomId}`);
@@ -148,12 +148,12 @@ function App() {
     // Viewer stats
     ioConnection.on("roomUser", (msg) => {
       if (typeof msg.viewerCount === "number") {
-        setViewerCount(msg.viewerCount);
+        viewerCount.current = msg.viewerCount;
       }
     });
 
     ioConnection.on("join", async (msg) => {
-      if (viewerCount < 5) {
+      if (viewerCount.current < 5 && !isManualSpeech.current) {
         isManualSpeech.current = true;
         await hostSpeak(
           GRATITUDE_PHRASES[
@@ -365,8 +365,8 @@ function App() {
       {loaded && connectedRoom && (
         <div>
           <div className="greeting">
-            <span>Hi, my name is Phendran.</span>
-            <span> I hope you enjoy the show :)</span>
+            <span>Hi, my name is Phendran!</span>
+            <span>Like and follow to interact with me!</span>
           </div>
           <div className="waitlist">
             <span className="label">Waitlist:</span>
@@ -375,7 +375,7 @@ function App() {
           <div className="legend">
             <span className="offer">
               Follow / Share / Gift{" "}
-              <span style={{ color: "orange" }}>&#8594;</span> Reply
+              <span style={{ color: "orange" }}>&#8594;</span> Greeting
             </span>
             <span className="offer">
               Gift {`>`} 50 x diamonds{" "}
